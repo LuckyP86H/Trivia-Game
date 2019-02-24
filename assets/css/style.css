@@ -1,0 +1,101 @@
+/* design from assignment 1+2 */
+body {
+  background: url("../images/dataScience.png");
+  background-size: 97%;
+}
+
+h1 {
+  text-align: center;
+  color: black;
+  font-weight: bolder;
+  padding: 20px;
+  font-size: 45px;
+}
+
+p1{
+  margin: 10px;
+  font-weight: bold;
+  color:rgba(5, 54, 54, 0.918);
+  font-size: 25px;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+p {
+  margin: 10px;
+  font-weight: bold;
+  color:lightcoral;
+  font-size: 20px;
+  
+}
+
+h2, h4 {
+  margin: 30px;
+  font-weight: bold;
+}
+
+/* design from assignment 1 */
+
+.container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  clear: both;
+}
+
+.answerchoice {
+	border: 1px solid black;
+  border-radius: 5%;
+	width: 40%;
+	color: black;
+  text-align: center;
+  margin: 10px auto;
+  font-size: 20px;
+  background-color: darkcyan;
+
+}
+
+img {
+  max-height: 250px;
+  width: auto;
+}
+
+#answerblock {
+  text-align: center;
+
+}
+
+#questionblock {
+  text-align: center;
+  font-weight: bold;
+}
+
+#reset {
+  visibility: visible;
+}
+
+.wrapper {
+  margin: 10px auto;
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 2px solid gray;
+  height: 450px;
+  width: 100%;
+  text-align: center;
+}
+
+.btn {
+  position: relative;
+  bottom: -200px;
+}
+
+/* footer */
+footer {
+  position: fixed;
+  padding: 10px;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: black;
+  text-align: center;
+  font-size: 12px;
+}
+
