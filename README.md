@@ -1,5 +1,6 @@
-# JavaScript Assignment 2: Trivia Game (Advanced)
-### Instructions: 
+# Trivia Game 
+
+**Instructions**
 
 1. Topic: Basic Knowledge of Data Science (Machine Learning, Statistical Modelling, Artificial  Intelligence, Data Mining and etc.) 
 
