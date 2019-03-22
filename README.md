@@ -1,10 +1,10 @@
 # Trivia Game 
 
-**Instructions**
+## Instructions:**
 
 1. Topic: Basic Knowledge of Data Science (Machine Learning, Statistical Modelling, Artificial  Intelligence, Data Mining and etc.) 
 
-2. Instructions
+2. Steps:
 
    * There is a counter for limiting the time
 
@@ -18,9 +18,14 @@
 
 **Enjoy the game!**
 
-### Some Improvement: 
+## Notes: 
 
-1. use some advanced CSS for bootstrapping
-2. add math symbol to look more professional
-3. animation for showing result
-4. sound effect for click the question, counting down
+**Some Improvement:**
+
+  1. use some advanced CSS for bootstrapping
+
+  2. add math symbol to look more professional
+
+  3. animation for showing result
+
+  4. sound effect for click the question, counting down
