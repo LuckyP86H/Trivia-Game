@@ -29,3 +29,6 @@
   3. animation for showing result
 
   4. sound effect for click the question, counting down
+
+____________________
+<sub> &copy; Paul Xu at Univerversity of Toronto School of Continuing Studies Coding Boot Camp in March 2019 </sub>
