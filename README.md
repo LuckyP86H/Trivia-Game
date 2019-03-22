@@ -15,9 +15,7 @@
 
      - One question at each page. After answering the current question or run out of time, it move on to the next question.
 
-       ###### <https://luckyp86h.github.io/TriviaGame/>
-
-       ## Enjoy the game!
+**Enjoy the game!**
 
 ### Some Improvement: 
 
