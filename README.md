@@ -1,6 +1,6 @@
 # Trivia Game 
 
-## Instructions:**
+## Instructions:
 
 1. Topic: Basic Knowledge of Data Science (Machine Learning, Statistical Modelling, Artificial  Intelligence, Data Mining and etc.) 
 
