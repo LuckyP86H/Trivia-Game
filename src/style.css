@@ -1,0 +1,119 @@
+@import "tailwindcss";
+@import "@fontsource-variable/outfit";
+
+:root {
+  color-scheme: dark;
+  --bg: #0b1220;
+  --bg-glow: #14304a;
+  --surface: rgb(255 255 255 / 0.05);
+  --surface-strong: rgb(255 255 255 / 0.1);
+  --line: rgb(255 255 255 / 0.14);
+  --ink: #edf3fb;
+  --muted: #a9b7cc;
+  --accent: #5eead4;
+  --accent-ink: #052e2b;
+  --good: #4ade80;
+  --bad: #ff7a8a;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --bg: #f2f6fb;
+    --bg-glow: #cfe6f5;
+    --surface: rgb(255 255 255 / 0.85);
+    --surface-strong: #ffffff;
+    --line: rgb(11 18 32 / 0.16);
+    --ink: #0b1220;
+    --muted: #46566e;
+    --accent: #0f766e;
+    --accent-ink: #ffffff;
+    --good: #15803d;
+    --bad: #b4233a;
+  }
+}
+
+@theme inline {
+  --font-sans: "Outfit Variable", ui-rounded, system-ui, sans-serif;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    background:
+      radial-gradient(70rem 36rem at 50% -10%, var(--bg-glow), transparent 70%), var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 0.75rem;
+  }
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+}
+
+progress.timer {
+  appearance: none;
+  width: 100%;
+  height: 0.6rem;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-strong);
+}
+progress.timer::-webkit-progress-bar {
+  background: var(--surface-strong);
+}
+progress.timer::-webkit-progress-value {
+  background: var(--accent);
+  border-radius: 999px;
+}
+progress.timer::-moz-progress-bar {
+  background: var(--accent);
+  border-radius: 999px;
+}
+progress.timer[data-low="true"]::-webkit-progress-value {
+  background: var(--bad);
+}
+progress.timer[data-low="true"]::-moz-progress-bar {
+  background: var(--bad);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise-in {
+  animation: rise-in 240ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    animation: none;
+  }
+}
