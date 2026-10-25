@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["e2e/**/*.spec.ts", "supabase/**/*.test.ts", "scripts/*.mjs"],
+  "project": ["src/**/*.{ts,vue,css}", "e2e/**/*.ts", "supabase/**/*.ts", "*.config.ts"],
+  "ignoreExportsUsedInFile": true
+}
