@@ -58,17 +58,31 @@ The game is fully playable with no setup. Copy `.env.example` to `.env.local` an
 - [`src/stores/game.ts`](src/stores/game.ts): one Pinia store connecting the engine to the screens and saving progress to `localStorage` (corrupt or blocked storage falls back to a fresh start).
 - The daily set comes from a seeded shuffle keyed by the UTC date, so it needs no server. The timer counts in 100 ms ticks and one tick never counts for more than 250 ms, so a tab left in the background doesn't use up a player's time.
 
-## Online leaderboard (Supabase, optional)
+## Online leaderboard
 
-[`supabase/migrations`](supabase/migrations) creates a `trivia` schema (so one Supabase project can host several apps) with a `scores` table and a public `daily_top` view. Row-level security means:
+The Daily result screen can post a score to a public board. The game is fully playable without it: if no backend answers, the form simply doesn't appear. There are two interchangeable backends behind the same `Leaderboard` interface in [`src/lib/leaderboard.ts`](src/lib/leaderboard.ts).
+
+### Cloudflare Worker + D1 (default)
+
+[`worker/`](worker) is a small Hono API on the same Worker that serves the site, backed by D1 ([`migrations/`](migrations)):
+
+| Method and path | Purpose |
+| --- | --- |
+| `GET /api/health` | Liveness check; the client only shows the board when this answers `{ "ok": true }` |
+| `GET /api/daily/:day/top` | Top 10 for a day: nickname, points, correct, total (no player ids) |
+| `POST /api/daily/:day/scores` | Body `{ playerId, nickname, points, correct, total }`. `201` new, `200` already posted |
+
+The Worker re-checks everything it can: the day must be today +/- 1 (UTC), a nickname is 1 to 24 printable characters, a Daily has exactly five questions, and the points must be consistent with the number correct (100 to 200 per right answer, nothing for a wrong one). A player (random per-browser UUID, no accounts) keeps their first score of the day. Scores are still reported by the browser, so a determined player can post a plausible fake within those limits; fine for a practice board, and a serious one would verify answers on the server.
+
+### Supabase (optional alternative)
+
+If `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set at build time, the site uses Supabase instead. [`supabase/migrations`](supabase/migrations) creates a `trivia` schema (so one Supabase project can host several apps) with a `scores` table and a public `daily_top` view. Row-level security means:
 
 - anyone can read scores, and nobody can edit them;
 - a player can only insert and delete rows as themselves (anonymous sign-in counts);
 - one Daily score per player per day, and scores are capped at what the game can award (200 points per question).
 
-Scores are reported by the browser, so a determined player can post a plausible fake score within those caps. That is fine for a practice leaderboard; a serious one would verify answers on the server.
-
-The SQL is tested against a real Postgres engine (PGlite) with Supabase's `auth.uid()` and roles stubbed, including the policies and constraints.
+The SQL is tested against a real Postgres engine (PGlite) with Supabase's `auth.uid()` and roles stubbed, including the policies and constraints. It has **not** been run against a real Supabase project yet.
 
 Setup:
 
@@ -81,15 +95,16 @@ Free-tier note: Supabase pauses free projects after a week without activity, and
 
 ## Deploy
 
-The app is a static site served by Cloudflare Workers Static Assets ([`wrangler.jsonc`](wrangler.jsonc)); there is no server code.
+The app is one Cloudflare Worker: static assets for the site plus the `/api/*` leaderboard, with a D1 database, all declared in [`wrangler.jsonc`](wrangler.jsonc). The database id in that file belongs to the original deployment; a fork creates its own with `pnpm exec wrangler d1 create trivia-game` and replaces it.
 
 ```sh
 export CLOUDFLARE_API_TOKEN=...   # template "Edit Cloudflare Workers"
 export CLOUDFLARE_ACCOUNT_ID=...
 pnpm run cf:deploy                # type-check, build, upload
+pnpm run db:migrate:remote        # create the scores table (run again after adding a migration)
 ```
 
-Or use the GitHub Actions workflow (add the two secrets above; it deploys after the checks pass on the default branch and does nothing while they are missing), or Cloudflare Workers Builds with build command `pnpm build`, deploy command `pnpm exec wrangler deploy`, and the dashboard's default `npx wrangler preview` for other branches (it needs the `previews` block already in `wrangler.jsonc`). `pnpm install` runs `scripts/prepare.mjs`, which builds the app when Cloudflare's `WORKERS_CI=1` is set, so an empty build command still works. Unlike the Crystal Collector project, no database token scope is needed: this Worker has no bindings.
+Or use the GitHub Actions workflow (add the two secrets above; it deploys after the checks pass on the default branch and does nothing while they are missing), or Cloudflare Workers Builds with build command `pnpm build`, deploy command `pnpm exec wrangler deploy`, and the dashboard's default `npx wrangler preview` for other branches (it needs the `previews` block already in `wrangler.jsonc`). `pnpm install` runs `scripts/prepare.mjs`, which builds the app when Cloudflare's `WORKERS_CI=1` is set, so an empty build command still works. The token that Workers Builds creates by itself cannot edit D1, so keep the `database_id` committed and apply migrations with `pnpm run db:migrate:remote` (or let the Actions workflow do it).
 
 ## Version notes
 

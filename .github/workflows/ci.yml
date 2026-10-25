@@ -34,6 +34,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Generated Worker types are up to date
+        run: pnpm exec wrangler types --check
+
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
@@ -100,3 +103,6 @@ jobs:
 
       - if: steps.credentials.outputs.configured == 'true'
         run: pnpm run cf:deploy
+
+      - if: steps.credentials.outputs.configured == 'true'
+        run: pnpm run db:migrate:remote

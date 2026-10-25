@@ -19,7 +19,7 @@ import {
 import { createRng } from "../engine/random";
 import { createLeaderboard, type Leaderboard, type TopScore } from "../lib/leaderboard";
 import { liveStreak, type Mode, recordGame } from "../lib/progress";
-import { loadProgress, saveProgress } from "../lib/storage";
+import { loadPlayerId, loadProgress, saveProgress } from "../lib/storage";
 
 export const PRACTICE_COUNT = 10;
 
@@ -52,6 +52,7 @@ export const useGame = defineStore("game", () => {
     leaderboard.value = await createLeaderboard({
       url: import.meta.env.VITE_SUPABASE_URL,
       key: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      playerId: loadPlayerId(),
     });
     await refreshTop();
   }

@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
 import type { Answer } from "../engine/quiz";
 import { summarise } from "../engine/quiz";
-import { makeLeaderboard, type SupabaseLike } from "./leaderboard";
+import {
+  createLeaderboard,
+  type FetchLike,
+  makeApiLeaderboard,
+  makeLeaderboard,
+  type SupabaseLike,
+} from "./leaderboard";
 import { EMPTY_PROGRESS, liveStreak, marksOf, parseProgress, recordGame } from "./progress";
 import { buildShareText, dayNumber } from "./share";
-import { type KeyValueStore, loadProgress, saveProgress } from "./storage";
+import { type KeyValueStore, loadPlayerId, loadProgress, saveProgress } from "./storage";
 
 const answer = (id: string, choice: number | null, correct: boolean, points = 0): Answer => ({
   questionId: id,
@@ -204,5 +210,109 @@ describe("leaderboard client", () => {
     } as unknown as SupabaseLike;
     expect(await makeLeaderboard(broken).topDaily("2026-10-25")).toBeNull();
     expect(await makeLeaderboard(broken).submitDaily(score)).toBe("failed");
+  });
+});
+
+describe("Worker leaderboard", () => {
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+  const entry = { nickname: "Ada", day: "2026-10-25", points: 340, correct: 3, total: 5 };
+
+  it("posts the score with the player id and a trimmed nickname", async () => {
+    let seen: { path: string; body: unknown } | undefined;
+    const fetchApi: FetchLike = async (path, init) => {
+      seen = { path, body: JSON.parse(String(init?.body)) };
+      return json({ saved: true }, 201);
+    };
+    const result = await makeApiLeaderboard(fetchApi, "player-1").submitDaily({
+      ...entry,
+      nickname: "  Ada ",
+    });
+    expect(result).toBe("saved");
+    expect(seen?.path).toBe("/api/daily/2026-10-25/scores");
+    expect(seen?.body).toEqual({
+      nickname: "Ada",
+      points: 340,
+      correct: 3,
+      total: 5,
+      playerId: "player-1",
+    });
+  });
+
+  it("maps 200 to already-submitted and any other status or a network error to failed", async () => {
+    const reply =
+      (status: number): FetchLike =>
+      async () =>
+        json({}, status);
+    const lb = (f: FetchLike) => makeApiLeaderboard(f, "p");
+    expect(await lb(reply(200)).submitDaily(entry)).toBe("already-submitted");
+    expect(await lb(reply(400)).submitDaily(entry)).toBe("failed");
+    expect(await lb(reply(500)).submitDaily(entry)).toBe("failed");
+    const offline: FetchLike = async () => {
+      throw new TypeError("network");
+    };
+    expect(await lb(offline).submitDaily(entry)).toBe("failed");
+  });
+
+  it("reads the top list, capped at the limit, and returns null when it can't", async () => {
+    const rows = Array.from({ length: 5 }, (_, i) => ({
+      nickname: `P${i}`,
+      points: 1,
+      correct: 1,
+      total: 5,
+    }));
+    let cache: RequestCache | undefined;
+    const ok: FetchLike = async (_path, init) => {
+      cache = init?.cache;
+      return json({ top: rows });
+    };
+    expect(await makeApiLeaderboard(ok, "p").topDaily("2026-10-25", 3)).toHaveLength(3);
+    expect(cache, "must revalidate so a just-posted score shows up").toBe("no-cache");
+    expect(
+      await makeApiLeaderboard(async () => json({}, 500), "p").topDaily("2026-10-25"),
+    ).toBeNull();
+    expect(
+      await makeApiLeaderboard(async () => json({ nope: 1 }), "p").topDaily("2026-10-25"),
+    ).toBeNull();
+  });
+
+  it("only goes online when the Worker answers its health check", async () => {
+    const healthy: FetchLike = async () => json({ ok: true });
+    expect(await createLeaderboard({ playerId: "p", fetchApi: healthy })).not.toBeNull();
+
+    // A static host answers every path with the HTML page, which is not JSON.
+    const spa: FetchLike = async () => new Response("<!doctype html>", { status: 200 });
+    expect(await createLeaderboard({ playerId: "p", fetchApi: spa })).toBeNull();
+    expect(
+      await createLeaderboard({ playerId: "p", fetchApi: async () => json({ ok: false }) }),
+    ).toBeNull();
+    expect(await createLeaderboard({ fetchApi: healthy })).toBeNull();
+  });
+});
+
+describe("loadPlayerId", () => {
+  const memory = (): KeyValueStore & { data: Map<string, string> } => {
+    const data = new Map<string, string>();
+    return { data, getItem: (k) => data.get(k) ?? null, setItem: (k, v) => void data.set(k, v) };
+  };
+
+  it("creates an id once and then reuses it", () => {
+    const store = memory();
+    const first = loadPlayerId(store);
+    expect(first).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(loadPlayerId(store)).toBe(first);
+  });
+
+  it("still returns an id when storage is blocked", () => {
+    const blocked: KeyValueStore = {
+      getItem: () => {
+        throw new Error("blocked");
+      },
+      setItem: () => {
+        throw new Error("blocked");
+      },
+    };
+    expect(loadPlayerId(blocked)).toHaveLength(36);
+    expect(loadPlayerId(null)).toHaveLength(36);
   });
 });

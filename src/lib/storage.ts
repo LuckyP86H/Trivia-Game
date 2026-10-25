@@ -35,3 +35,21 @@ export function saveProgress(
     // Storage full or blocked: the game still works, it just will not remember.
   }
 }
+
+const PLAYER_KEY = "stack-quiz:v1:player";
+
+/**
+ * A random id that tells one browser's leaderboard score from another's. It holds no personal
+ * data. When storage is blocked a fresh id is made each visit, so a repeat post is still possible.
+ */
+export function loadPlayerId(store: KeyValueStore | null = browserStore()): string {
+  try {
+    const saved = store?.getItem(PLAYER_KEY);
+    if (saved) return saved;
+    const id = crypto.randomUUID();
+    store?.setItem(PLAYER_KEY, id);
+    return id;
+  } catch {
+    return crypto.randomUUID();
+  }
+}

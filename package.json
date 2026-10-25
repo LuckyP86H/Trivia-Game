@@ -10,10 +10,10 @@
     "node": ">=22.12"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "pnpm db:migrate:local && vite",
     "build": "pnpm typecheck && vite build",
-    "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json && tsc -p tsconfig.node.json",
+    "preview": "pnpm db:migrate:local && vite preview",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json && tsc -p tsconfig.worker.json && tsc -p tsconfig.node.json",
     "lint": "biome check .",
     "format": "biome check --write .",
     "test": "vitest run",
@@ -21,11 +21,15 @@
     "knip": "knip",
     "cf:deploy": "pnpm build && wrangler deploy",
     "validate": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e && pnpm knip",
-    "prepare": "node scripts/prepare.mjs"
+    "prepare": "node scripts/prepare.mjs",
+    "cf-typegen": "wrangler types",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote"
   },
   "dependencies": {
     "@fontsource-variable/outfit": "^5.3.0",
     "@supabase/supabase-js": "^2.118.0",
+    "hono": "^4.13.13",
     "pinia": "^4.1.0",
     "vue": "^3.5.44",
     "zod": "^4.6.7"
@@ -33,17 +37,19 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
     "@biomejs/biome": "^2.6.2",
+    "@cloudflare/vite-plugin": "^1.65.0",
+    "@cloudflare/vitest-plugin": "^1.4.7",
     "@electric-sql/pglite": "^0.5.11",
     "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^22.20.5",
     "@vitejs/plugin-vue": "^6.0.10",
-    "@vitest/coverage-v8": "^5.0.5",
+    "@vitest/coverage-v8": "~5.0.5",
     "knip": "^6.42.1",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
     "vite": "^8.3.5",
-    "vitest": "^5.0.5",
+    "vitest": "~5.0.5",
     "vue-tsc": "^3.3.13",
     "wrangler": "^4.152.0"
   }
