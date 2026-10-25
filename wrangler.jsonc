@@ -2,6 +2,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "trivia-game",
   "compatibility_date": "2026-10-19",
+  // Required by `wrangler preview`, which Workers Builds runs for non-production branches.
+  "previews": {},
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"

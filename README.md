@@ -89,7 +89,7 @@ export CLOUDFLARE_ACCOUNT_ID=...
 pnpm run cf:deploy                # type-check, build, upload
 ```
 
-Or use the GitHub Actions workflow (add the two secrets above; it deploys after the checks pass on the default branch and does nothing while they are missing), or Cloudflare Workers Builds with build command `pnpm build` and deploy command `pnpm exec wrangler deploy`. `pnpm install` runs `scripts/prepare.mjs`, which builds the app when Cloudflare's `WORKERS_CI=1` is set, so an empty build command still works. Unlike the Crystal Collector project, no database token scope is needed: this Worker has no bindings.
+Or use the GitHub Actions workflow (add the two secrets above; it deploys after the checks pass on the default branch and does nothing while they are missing), or Cloudflare Workers Builds with build command `pnpm build`, deploy command `pnpm exec wrangler deploy`, and the dashboard's default `npx wrangler preview` for other branches (it needs the `previews` block already in `wrangler.jsonc`). `pnpm install` runs `scripts/prepare.mjs`, which builds the app when Cloudflare's `WORKERS_CI=1` is set, so an empty build command still works. Unlike the Crystal Collector project, no database token scope is needed: this Worker has no bindings.
 
 ## Version notes
 
