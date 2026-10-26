@@ -1,33 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Trivia Game Version 2</title>
-   
-    <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-</head>
-
-<body>
-    <p1>Welcome to my Trivia Page for Reviewing Data Science!</p1>
-
-
-    <div class="wrapper">
-        <div id="timeleft"></div>
-        <div id="questionblock"></div>
-        <div id="answerblock"></div>
-        <button class="btn btn-success" id="start">Start Game</button>
-        <button class="btn btn-success" id="reset">Play Again</button>
-    </div>
-    <footer>
-        <div class="container">
-            &copyWinter 2019 University of Toronto SCS Coding Boot Camp Paul Xu;
-        </div>
-    </footer>
-    
-    <script type="text/javascript" src="assets/javascript/app.js"></script>
-</body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Stack Quiz</title>
+    <meta name="description" content="A timed quiz on Python, queues, search, AWS, Redis, Snowflake, SQL, stats and LLMs, with spaced repetition and a daily challenge." />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2f6fb" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>Stack Quiz needs JavaScript to run.</noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
