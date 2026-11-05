@@ -4,6 +4,32 @@ allowBuilds:
 
 # Cloudflare's local-dev packages pin vulnerable patch releases of these two
 # libraries (see `pnpm audit`). Force the patched versions; remove once upstream catches up.
+minimumReleaseAgeExclude:
+  - "@biomejs/biome@2.6.5"
+  - "@biomejs/cli-android-arm64@2.6.5"
+  - "@biomejs/cli-android-x64@2.6.5"
+  - "@biomejs/cli-darwin-arm64@2.6.5"
+  - "@biomejs/cli-darwin-x64@2.6.5"
+  - "@biomejs/cli-linux-arm64-musl@2.6.5"
+  - "@biomejs/cli-linux-arm64@2.6.5"
+  - "@biomejs/cli-linux-x64-musl@2.6.5"
+  - "@biomejs/cli-linux-x64@2.6.5"
+  - "@biomejs/cli-win32-arm64@2.6.5"
+  - "@biomejs/cli-win32-x64@2.6.5"
+  - "@supabase/auth-js@2.119.0"
+  - "@supabase/functions-js@2.119.0"
+  - "@supabase/postgrest-js@2.119.0"
+  - "@supabase/realtime-js@2.119.0"
+  - "@supabase/storage-js@2.119.0"
+  - "@supabase/supabase-js@2.119.0"
+  - vite@8.3.6
+
 overrides:
   undici: ^7.30.1
   zod: ^4.6.7
+
+packages:
+  - "packages/*"
+  - "packages/**/*"
+  - "scripts/*"
+  - "scripts/**/*"
